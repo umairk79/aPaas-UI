@@ -1,0 +1,123 @@
+<div class="container">
+    <div class="dashboard-container">
+        <div class="row show-radio">
+            <div class="col-md-6"></div>
+            <div class="col-md-6">
+                <label class="radio-inline"><input type="radio" name="optradio" (change)="showRunning($event)">Show Up</label>
+                <label class="radio-inline"><input type="radio" name="optradio" (change)="showDown($event)">Show Down</label>
+                <label class="radio-inline"><input type="radio" name="optradio" checked (change)="showAll($event)">Show all</label>
+            </div>
+        </div>
+        <div class="clearfix table">
+            <div class="form-group">
+                <input type="text" class="form-control" id="usr" (keyup)="onKey($event)" placeholder="Search">
+            </div>
+            <div class="clearfix text-center">
+                <div class="cell col-md-1">
+                </div>
+                <div class="cell col-md-2">
+                    <strong> BOB ID</strong>
+                </div>
+                <div class="cell col-md-2">
+                    <strong>Pod name</strong>
+                </div>
+                <div class="cell col-md-2">
+                    <strong> Vault Env</strong>
+                </div>
+                <div class="cell col-md-2">
+                    <strong> Env</strong>
+                </div>
+                <div class="cell col-md-2">
+                    <strong> Last updated</strong>
+                </div>
+                <div class="cell-right col-md-1">
+                </div>
+            </div>
+            <div [dragula]='"another-bag"' [dragulaModel]='many'>
+                <ng-container *ngFor="let projectGL of projectsGLToShow; let i = index">
+                    <div class="project-element text-center" *ngIf="!projectGL.hidden" [ngClass]="{'down' : projectGL.running==false, 'running': projectGL.running==true}">
+                        <div class="clearfix project-header" data-toggle="collapse" [attr.data-target]="'#' + projectGL.bob_id">
+                            <div class="cell col-md-1">
+                            </div>
+                            <div class="cell col-md-2">
+                                {{projectGL.bob_id}}
+                            </div>
+                            <div class="cell col-md-2">
+                                {{projectGL.pod}}
+                            </div>
+                            <div class="cell col-md-2">
+                                {{projectGL.v_env}}
+                            </div>
+                            <div class="cell col-md-2">
+                                <span class="label env-label label-default" [ngClass]="{'label-primary' : projectGL.env=='CIT',
+                                'label-info' : projectGL.env=='NFT',
+                                'label-danger' : projectGL.env=='SIT',
+                                'label-warning' : projectGL.env=='PROD',
+                                'label-success' : projectGL.env=='OAT'}">
+                                 {{projectGL.env}}
+                                </span>
+                            </div>
+                            <div class="cell col-md-2">
+                                {{projectGL.last_updated}}
+                            </div>
+                            <div class="cell-right col-md-1">
+                                <span class="glyphicon glyphicon-remove" (click)="remove(i)"></span>
+                            </div>
+                        </div>
+                        <div class="clearfix" id={{projectGL.bob_id}} class="collapse">
+                            <div class="col-md-12 text-center">
+                                <div class="row project-name ">{{projectGL.name}}</div>
+                                <div class="row">
+                                    <div class="col-md-1">
+                                    </div>
+                                    <div class="col-md-10">
+                                        <span class="collapse-buttons label label-default" (click)="selectedProject(i)" data-toggle="modal" data-target="#env-specifier-modal">Change Env&nbsp;<span class="glyphicon glyphicon-upload"></span></span>
+                                        <span class="collapse-buttons label label-primary">Get routes&nbsp;<span class="glyphicon glyphicon-download"></span></span>
+                                        <span class="collapse-buttons label label-success" [ngClass]="{'label-danger' : projectGL.appd=='false'}">Appd&nbsp;<span class="glyphicon glyphicon-ok" [ngClass]="{'glyphicon-remove' : projectGL.appd=='false'}"></span></span>
+                                        <span class="collapse-buttons label label-success" [ngClass]="{'label-danger' : projectGL.elk=='false'}">ELK&nbsp;<span class="glyphicon glyphicon-ok" [ngClass]="{'glyphicon-remove' : projectGL.elk=='false'}"></span></span>
+                                        <span class="collapse-buttons label label-success" [ngClass]="{'label-danger' : projectGL.wily=='false'}">Wily&nbsp;<span class="glyphicon glyphicon-ok" [ngClass]="{'glyphicon-remove' : projectGL.wily=='false'}"></span></span>
+                                    </div>
+                                    <div class="col-md-1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+            <mat-slide-toggle class="example-margin" [(checked)]="bothDc">
+                <ng-container *ngIf="!bothDc">
+                    Only {{ currentDc }}
+                </ng-container>
+                <ng-container *ngIf="bothDc">
+                    Both GL and SL
+                </ng-container>
+            </mat-slide-toggle>
+        </div>
+    </div>
+</div>
+
+<div id="env-specifier-modal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change environment for {{ selectedBobId }}</h4>
+            </div>
+            <div class="modal-body">
+                <label class="radio-inline"><input type="radio" [(ngModel)]="selectedEnv" value="none" name="optradio"><span class="label env-label label-default">NONE</span></label>
+                <label class="radio-inline"><input type="radio" [(ngModel)]="selectedEnv" value="NFT" name="optradio"><span class="label env-label label-info">NFT</span></label>
+                <label class="radio-inline"><input type="radio" [(ngModel)]="selectedEnv" value="SIT" name="optradio"><span class="label env-label label-danger">SIT</span></label>
+                <label class="radio-inline"><input type="radio" [(ngModel)]="selectedEnv" value="PROD" name="optradio"><span class="label env-label label-warning">PROD</span></label>
+                <label class="radio-inline"><input type="radio" [(ngModel)]="selectedEnv" value="OAT" name="optradio"><span class="label env-label label-success">OAT</span></label>
+                <label class="radio-inline"><input type="radio" [(ngModel)]="selectedEnv" value="CIT" name="optradio"><span class="label env-label label-primary">CIT</span></label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-default" (click)="postEnv()">Submit</button>
+            </div>
+        </div>
+
+    </div>
+</div>
